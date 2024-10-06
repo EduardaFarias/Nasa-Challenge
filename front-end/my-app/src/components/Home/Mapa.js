@@ -1,17 +1,51 @@
-import { Box, Text, Button, Link, VStack, HStack, AspectRatio } from "@chakra-ui/react";
-import Head from "next/head";
-import Image from "next/image";
-import MenuTop from "./MenuTop";
+import { useEffect, useState } from "react";
+import { Box } from "@chakra-ui/react";
 
 export default function Mapa() {
+  const [location, setLocation] = useState({ lat: null, lng: null });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error obtaining location:", error);
+        }
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (location.lat && location.lng) {
+      // Carregar o Google Maps apenas após a localização ser obtida
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAdJ_z74sxFupjWP7LuQ7e2hIi_3PsYFp4&callback=initMap`;
+      script.async = true;
+      document.head.appendChild(script);
+
+      window.initMap = function () {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          center: location,
+          zoom: 14,
+        });
+
+        new google.maps.Marker({
+          position: location,
+          map: map,
+          title: "Você está aqui!",
+        });
+      };
+    }
+  }, [location]);
+
   return (
-    <>
-     <Box >
-     <AspectRatio ratio={16 / 9}>
-  <iframe src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.952912260219!2d3.375295414770757!3d6.5276316452784755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2ae68280c1%3A0xdc9e87a367c3d9cb!2sLagos!5e0!3m2!1sen!2sng!4v1567723392506!5m2!1sen!2sng' />
-</AspectRatio>
-   </Box> 
-      
-    </>
+    <Box height="400px">
+      <div id="map" style={{ height: "100%", width: "100%" }}></div>
+    </Box>
   );
 }
