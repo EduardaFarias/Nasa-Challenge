@@ -5,6 +5,7 @@ import Report from './Report'; // Importa o componente Report
 export default function Mapa() {
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [showPopup, setShowPopup] = useState(false); // Estado para controlar a exibição do popup
+  const [selectedCoords, setSelectedCoords] = useState({ lat: null, lng: null }); // Coordenadas selecionadas
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY; // Acessa a chave da variável de ambiente
 
   useEffect(() => {
@@ -44,7 +45,13 @@ export default function Mapa() {
         });
 
         // Adiciona o listener de clique no marcador
-        marker.addListener("click", () => {
+        marker.addListener("click", (event) => {
+          // Obtém a latitude e longitude do local clicado
+          const clickedCoords = {
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng(),
+          };
+          setSelectedCoords(clickedCoords); // Armazena as coordenadas clicadas
           setShowPopup(true); // Exibe o popup ao clicar no marcador
         });
       };
@@ -70,7 +77,7 @@ export default function Mapa() {
           boxShadow="md"
           zIndex={1000} // Garante que o popup fique sobre o mapa
         >
-          <Report /> {/* Renderiza o componente Report */}
+          <Report coords={selectedCoords} /> {/* Passa as coordenadas para o componente Report */}
         </Box>
       )}
     </>
