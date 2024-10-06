@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
+import Report from './Report'; // Importa o componente Report
 
 export default function Mapa() {
   const [location, setLocation] = useState({ lat: null, lng: null });
+  const [showPopup, setShowPopup] = useState(false); // Estado para controlar a exibição do popup
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY; // Acessa a chave da variável de ambiente
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -24,7 +27,7 @@ export default function Mapa() {
     if (location.lat && location.lng) {
       // Carregar o Google Maps apenas após a localização ser obtida
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAdJ_z74sxFupjWP7LuQ7e2hIi_3PsYFp4&callback=initMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`; // Usa a variável de ambiente
       script.async = true;
       document.head.appendChild(script);
 
@@ -34,18 +37,42 @@ export default function Mapa() {
           zoom: 14,
         });
 
-        new google.maps.Marker({
+        const marker = new google.maps.Marker({
           position: location,
           map: map,
           title: "Você está aqui!",
         });
+
+        // Adiciona o listener de clique no marcador
+        marker.addListener("click", () => {
+          setShowPopup(true); // Exibe o popup ao clicar no marcador
+        });
       };
     }
-  }, [location]);
+  }, [location, apiKey]);
 
   return (
-    <Box position="fixed" top="0" left="0" right="0" bottom="0">
-      <div id="map" style={{ height: "100%", width: "100%" }}></div>
-    </Box>
+    <>
+      <Box position="fixed" top="0" left="0" right="0" bottom="0">
+        <div id="map" style={{ height: "100%", width: "100%" }}></div>
+      </Box>
+
+      {/* Exibe o componente Report como um popup se o estado showPopup for true */}
+      {showPopup && (
+        <Box 
+          position="fixed" 
+          top="50%" 
+          left="50%" 
+          transform="translate(-50%, -50%)"
+          bg="white" 
+          p={4} 
+          borderRadius="md" 
+          boxShadow="md"
+          zIndex={1000} // Garante que o popup fique sobre o mapa
+        >
+          <Report /> {/* Renderiza o componente Report */}
+        </Box>
+      )}
+    </>
   );
 }
