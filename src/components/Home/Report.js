@@ -1,25 +1,21 @@
 import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalBody,
-    ModalCloseButton,
     Box,
     Button,
-    Text,
+    HStack,
     Image,
-    Stack,
-    Flex,
     Input,
     InputGroup,
-    InputLeftElement,
-    InputRightElement,
-    useDisclosure,
-  } from "@chakra-ui/react";
-  import { useState } from "react";
-  import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-  import { faSearch } from '@fortawesome/free-solid-svg-icons'; // Ícone de pesquisa
-  import axios from 'axios'; // Importando o axios
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalOverlay,
+    Stack,
+    Text,
+    useDisclosure
+} from "@chakra-ui/react";
+import axios from 'axios'; // Importando o axios
+import { useState } from "react";
   
   export default function Report({ coords }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -71,22 +67,19 @@ import {
             <ModalCloseButton />
             <ModalBody>
               {/* Barra de pesquisa com botão de confirmar */}
-              <InputGroup mb={2}>
-                <InputLeftElement pointerEvents="none">
-                  <FontAwesomeIcon icon={faSearch} color="gray.300" style={{ fontSize: '12px' }} />
-                </InputLeftElement>
-                <Input
+              <HStack>
+              <Input
                   type="text"
                   placeholder="Pesquisar produto..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o estado da pesquisa
                 />
-                {/* Botão de Confirmar dentro do fundo cinza */}
-                <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={handleConfirm} bg="gray.200" marginRight={"8px"}>
+                <Button padding="1rem 1rem" size="md" onClick={handleConfirm} bg="gray.200">
                     Confirmar
-                  </Button>
-                </InputRightElement>
+                </Button>
+              </HStack>
+              <InputGroup mb={2}>
+                {/* Botão de Confirmar dentro do fundo cinza */}
               </InputGroup>
   
               {/* Imagem com borda colorida e bordas arredondadas centralizada */}
