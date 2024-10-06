@@ -2,7 +2,6 @@ import {
     Modal,
     ModalOverlay,
     ModalContent,
-    ModalHeader,
     ModalBody,
     ModalCloseButton,
     Box,
@@ -11,35 +10,81 @@ import {
     Image,
     Stack,
     Flex,
+    Input,
+    InputGroup,
+    InputLeftElement,
+    InputRightElement,
     useDisclosure,
   } from "@chakra-ui/react";
+  import { useState } from "react";
+  import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+  import { faSearch } from '@fortawesome/free-solid-svg-icons'; // Ícone de pesquisa
   
   export default function Report() {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [showButton, setShowButton] = useState(true); // Estado para controlar a exibição do botão
+    const [searchTerm, setSearchTerm] = useState(""); // Estado para controlar a pesquisa
+  
+    // Função para fechar o modal e esconder o botão
+    const handleClose = () => {
+      onClose(); // Fecha o modal
+      setShowButton(false); // Esconde o botão ao fechar o modal
+    };
+  
+    // Função para lidar com a pesquisa e salvar o valor
+    const handleConfirm = () => {
+      console.log("Valor pesquisado:", searchTerm); // Aqui você pode salvar o valor pesquisado
+      alert(`Pesquisa salva: ${searchTerm}`);
+      // Outras ações, como salvar o valor no banco de dados ou fazer uma requisição API
+    };
   
     return (
       <>
-        {/* Botão para abrir o modal */}
-        <Button onClick={onOpen} colorScheme="teal">
-          Ver Detalhes
-        </Button>
+        {/* Mostra o botão Ver Detalhes apenas se showButton for true */}
+        {showButton && (
+          <Button onClick={onOpen} colorScheme="teal">
+            Ver Detalhes
+          </Button>
+        )}
   
-        {/* Modal estilizado */}
-        <Modal isOpen={isOpen} onClose={onClose} size="md">
+        {/* Modal só é renderizado quando isOpen for true */}
+        <Modal isOpen={isOpen} onClose={handleClose} size="md">
           <ModalOverlay />
           <ModalContent borderRadius="lg" p={4}>
             <ModalCloseButton />
             
-            {/* Imagem do produto */}
+            {/* Barra de pesquisa com botão de confirmar */}
             <ModalBody>
+              <InputGroup mb={2}>
+                <InputLeftElement pointerEvents="none">
+                  <FontAwesomeIcon icon={faSearch} color="gray.300" style={{ fontSize: '12px' }} /> {/* Tamanho da lupa ajustado */}
+                </InputLeftElement>
+                <Input
+                  type="text"
+                  placeholder="Pesquisar produto..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o estado da pesquisa
+                />
+                {/* Botão de Confirmar dentro do fundo cinza */}
+                <InputRightElement width="4.5rem">
+                  <Button h="1.75rem" size="sm" onClick={handleConfirm} bg="gray.200" marginRight={"8px"}>
+                    Confirmar
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+  
+              {/* Imagem com borda colorida e bordas arredondadas centralizada */}
               <Image
                 src="assets/planta.jpeg" // Substitua pela URL da sua imagem
-                alt="Caramel Frappuccino"
-                borderRadius="md"
+                alt="Planta"
+                borderRadius="350px" // Borda arredondada
+                border="4px solid teal" // Borda colorida
+                width="120px" // Defina o tamanho da imagem
+                mt={10} // Ajuste o espaçamento superior para aproximar da barra de pesquisa
+                mx="auto" // Centraliza a imagem horizontalmente
               />
   
-              {/* Detalhes do produto */}
-              <Box mt={4} textAlign="center">
+              <Box mt={2} textAlign="center">
                 <Text fontWeight="bold" fontSize="2xl">
                   Caramel Frappuccino
                 </Text>
