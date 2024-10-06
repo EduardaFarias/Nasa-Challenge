@@ -8,6 +8,7 @@ export default function MenuTop() {
       {/* Logo alinhada à esquerda */}
       <Box flex="1">
         <Image
+        borderRadius="50px"
           src="/assets/logo.webp" 
           alt="Logo"
           height="60px" // Ajuste o tamanho da imagem conforme necessário
