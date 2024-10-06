@@ -79,7 +79,7 @@ import {
                 </InputLeftElement>
                 <Input
                   type="text"
-                  placeholder="Pesquisar produto..."
+                  placeholder="Search Product..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)} 
                 />
@@ -104,12 +104,11 @@ import {
   
               <Box mt={2} textAlign="center">
                 <Text fontWeight="bold" fontSize="2xl">
-                  Localização selecionada:
+                Selected location:
                 </Text>
                 <Text fontWeight="bold" fontSize="xl" color="green.500">
                   Latitude: {coords.lat}, Longitude: {coords.lng}
                 </Text>
-                <Text color="gray.500">Coordenadas obtidas do clique no mapa</Text>
   
                 {/* Exibindo os retângulos com os nomes das métricas */}
                 <Stack direction="column" mt={4} spacing={2}>
