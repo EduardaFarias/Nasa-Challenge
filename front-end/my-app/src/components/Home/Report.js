@@ -19,41 +19,40 @@ import {
   import { useState } from "react";
   import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faSearch } from '@fortawesome/free-solid-svg-icons'; // Ícone de pesquisa
-  
-  // Simula os dados recebidos
-  const metrics = [
-    { dimension: "mm³", name: "Evapotranspiration" },
-    { dimension: "g/m³", name: "Absolute Humidity" },
-    { dimension: "µg/m³", name: "Nitrogen Dioxide Concentration" },
-    { dimension: "µg/m³", name: "Nitrogen Oxide Concentration" },
-    { dimension: "µg/m³", name: "Ozone concentration" },
-    { dimension: "µg/m³", name: "Hydrophilic Black Carbon Concentration" },
-    { dimension: "µg/m³", name: "Hydrophobic Black Carbon Concentration" },
-    { dimension: "µg/m³", name: "Carbon Monoxide Concentration" },
-    { dimension: "µg/m³", name: "Particulate Matter PM10 Concentration" },
-    { dimension: "µg/m³", name: "Particulate Matter PM1 Concentration" },
-    { dimension: "µg/m³", name: "Particulate Matter PM2-5 Concentration" },
-    { dimension: "µg/m³", name: "Sulfur Dioxide Concentration" },
-    { dimension: "Cº", name: "Temperature at 2 Meters" },
-    { dimension: "m/s", name: "Wind Speed at 2 Meters" },
-    { dimension: "%", name: "Relative Humidity at 2 Meters" },
-  ];
+  import axios from 'axios'; // Importando o axios
   
   export default function Report({ coords }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [showButton, setShowButton] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [showButton, setShowButton] = useState(true); // Estado para controlar a exibição do botão
+    const [searchTerm, setSearchTerm] = useState(""); // Estado para controlar a pesquisa
+    const [metrics, setMetrics] = useState([]); // Estado para armazenar os dados da API
+    const [selectedMetric, setSelectedMetric] = useState(null); // Estado para armazenar a métrica selecionada
   
     // Função para fechar o modal e esconder o botão
     const handleClose = () => {
-      onClose(); 
-      setShowButton(false); 
+      onClose();
+      setShowButton(false);
     };
   
-    // Função para lidar com a pesquisa e salvar o valor
-    const handleConfirm = () => {
-      console.log("Valor pesquisado:", searchTerm); 
-      alert(`Pesquisa salva: ${searchTerm}`);
+    // Função para lidar com a pesquisa e fazer a requisição usando Axios
+    const handleConfirm = async () => {
+      const lat = coords.lat;
+      const lng = coords.lng;
+  
+      // URL com latitude, longitude e crop do input
+      const url = `https://ttimzwkej4tutb5gjkehenrqn40ygeij.lambda-url.us-east-1.on.aws/recommendations?lat=${lat}&long=${lng}&crop=${searchTerm}`;
+  
+      try {
+        const response = await axios.get(url); // Fazendo a requisição com Axios
+        setMetrics(response.data); // Atualiza as métricas recebidas
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      }
+    };
+  
+    // Função para abrir o modal com os detalhes da métrica
+    const handleMetricClick = (metric) => {
+      setSelectedMetric(metric);
     };
   
     return (
@@ -65,23 +64,22 @@ import {
           </Button>
         )}
   
-        {/* Modal só é renderizado quando isOpen for true */}
+        {/* Modal principal */}
         <Modal isOpen={isOpen} onClose={handleClose} size="md">
           <ModalOverlay />
           <ModalContent borderRadius="lg" p={4}>
             <ModalCloseButton />
-            
-            {/* Barra de pesquisa com botão de confirmar */}
             <ModalBody>
+              {/* Barra de pesquisa com botão de confirmar */}
               <InputGroup mb={2}>
                 <InputLeftElement pointerEvents="none">
-                  <FontAwesomeIcon icon={faSearch} color="gray.300" style={{ fontSize: '12px' }} /> {/* Tamanho da lupa ajustado */}
+                  <FontAwesomeIcon icon={faSearch} color="gray.300" style={{ fontSize: '12px' }} />
                 </InputLeftElement>
                 <Input
                   type="text"
-                  placeholder="Search Product..."
+                  placeholder="Pesquisar produto..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)} 
+                  onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o estado da pesquisa
                 />
                 {/* Botão de Confirmar dentro do fundo cinza */}
                 <InputRightElement width="4.5rem">
@@ -95,31 +93,26 @@ import {
               <Image
                 src="assets/planta.jpeg"
                 alt="Planta"
-                borderRadius="350px" 
+                borderRadius="350px"
                 border="4px solid teal"
                 width="120px"
                 mt={10}
                 mx="auto"
               />
   
-              <Box mt={2} textAlign="center">
-                <Text fontWeight="bold" fontSize="2xl">
-                Selected location:
-                </Text>
-                <Text fontWeight="bold" fontSize="xl" color="green.500">
-                  Latitude: {coords.lat}, Longitude: {coords.lng}
-                </Text>
-  
-                {/* Exibindo os retângulos com os nomes das métricas */}
-                <Stack direction="column" mt={4} spacing={2}>
+              {/* Exibindo os quadrados das métricas */}
+              <Box mt={4}>
+                <Stack direction="column" spacing={4}>
                   {metrics.map((metric, index) => (
                     <Box
                       key={index}
                       bg="gray.100"
-                      p={2}
+                      p={4}
                       borderRadius="md"
                       boxShadow="sm"
-                      textAlign="center"
+                      cursor="pointer"
+                      onClick={() => handleMetricClick(metric)} // Ao clicar, abre o modal com detalhes
+                      _hover={{ bg: "gray.200" }}
                     >
                       <Text fontWeight="bold">{metric.name}</Text>
                       <Text fontSize="sm" color="gray.500">{metric.dimension}</Text>
@@ -130,6 +123,21 @@ import {
             </ModalBody>
           </ModalContent>
         </Modal>
+  
+        {/* Modal de detalhes da métrica */}
+        {selectedMetric && (
+          <Modal isOpen={Boolean(selectedMetric)} onClose={() => setSelectedMetric(null)}>
+            <ModalOverlay />
+            <ModalContent borderRadius="lg" p={4}>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text fontWeight="bold" fontSize="2xl">{selectedMetric.name}</Text>
+                <Text fontSize="lg" color="green.500">Value: {selectedMetric.value}</Text>
+                <Text mt={4}>{selectedMetric.recommendation}</Text>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        )}
       </>
     );
   }
