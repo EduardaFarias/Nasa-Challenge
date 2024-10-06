@@ -1,11 +1,12 @@
+import { Box, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { Box } from "@chakra-ui/react";
 import Report from './Report'; // Importa o componente Report
 
 export default function Mapa() {
   const [location, setLocation] = useState({ lat: null, lng: null });
   const [showPopup, setShowPopup] = useState(false); // Estado para controlar a exibição do popup
   const [selectedCoords, setSelectedCoords] = useState({ lat: null, lng: null }); // Coordenadas selecionadas
+  const toast = useToast()
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY; // Acessa a chave da variável de ambiente
 
   useEffect(() => {
@@ -18,6 +19,13 @@ export default function Mapa() {
           });
         },
         (error) => {
+          toast({
+            status: "error",
+            duration: 5000,
+            position: "top-right",
+            title: "Error obtaining location",
+            description: "Please allow the app to get your geolocation."
+          })
           console.error("Error obtaining location:", error);
         }
       );

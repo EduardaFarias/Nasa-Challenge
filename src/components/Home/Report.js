@@ -1,23 +1,24 @@
 import {
-    Box,
-    Button,
-    HStack,
-    Image,
-    Input,
-    InputGroup,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalOverlay,
-    Stack,
-    Text,
-    useDisclosure
+  Box,
+  Button,
+  HStack,
+  Image,
+  Input,
+  InputGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  Stack,
+  Text,
+  useDisclosure
 } from "@chakra-ui/react";
 import axios from 'axios'; // Importando o axios
 import { useState } from "react";
   
   export default function Report({ coords }) {
+    const [isLoading, setIsLoading] = useState(false)
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [showButton, setShowButton] = useState(true); // Estado para controlar a exibição do botão
     const [searchTerm, setSearchTerm] = useState(""); // Estado para controlar a pesquisa
@@ -39,7 +40,9 @@ import { useState } from "react";
       const url = `https://ttimzwkej4tutb5gjkehenrqn40ygeij.lambda-url.us-east-1.on.aws/recommendations?lat=${lat}&long=${lng}&crop=${searchTerm}`;
   
       try {
+        setIsLoading(true)
         const response = await axios.get(url); // Fazendo a requisição com Axios
+        setIsLoading(false)
         setMetrics(response.data); // Atualiza as métricas recebidas
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
@@ -74,7 +77,7 @@ import { useState } from "react";
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)} // Atualiza o estado da pesquisa
                 />
-                <Button padding="1rem 1rem" size="md" onClick={handleConfirm} bg="gray.200">
+                <Button isLoading={isLoading} padding="1rem 1rem" size="md" onClick={handleConfirm} bg="gray.200">
                     Confirmar
                 </Button>
               </HStack>
